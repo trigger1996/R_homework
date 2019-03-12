@@ -7,7 +7,7 @@ from keras.preprocessing.text import Tokenizer
 config = {
     'host':'127.0.0.1',
     'port':3306,                        # MySQL默认端口
-    'user':'root',                      # MySQL默认用户名
+    'user':'ghost',                     # MySQL默认用户名, root
     'password':'1730',                  # <无密码，直接输入空，不然就是1730>
     'db':'db',                          # 数据库名称
     'charset':'utf8',
