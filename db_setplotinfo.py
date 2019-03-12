@@ -13,8 +13,8 @@ config = {
 db_name         = 'db'
 train_tablename = 'wordlist_train'
 test_tablename  = 'wordlist_test'
-
-
+title_index_tablename   = 'word_index_title'
+context_index_tablename = 'word_index_context'
 
 def set_SQL_traindata_index(train_x, train_y, index, number_train):
     db = pymysql.connect(**config)
@@ -83,3 +83,62 @@ def set_SQL_testdata_index(test_x, test_y, index, number_test):
 
     finally:
         db.close()
+
+def update_WordIndex_Title(word_index_title):
+    db = pymysql.connect(**config)
+
+    try:
+        with db.cursor() as cursor:
+            #sql="select * from " + db_name
+            #cursor.execute(sql)
+
+            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            sql = "drop table if exists " + title_index_tablename
+            cursor.execute(sql)
+            '''创建表'''
+            sql = "create table " + title_index_tablename + "(value INT,word VARCHAR(50))"
+            cursor.execute(sql)  # 创建表
+
+            '''把所有的东西放进表格'''
+            word_index_list = list(word_index_title)         # 这个是字典dict，而且主键居然是文字，非常难操作
+            size_index = len(word_index_title)
+            for i in range(1, size_index):
+                temp = word_index_list[i]
+                sql = "INSERT INTO " + title_index_tablename + "(value,word) VALUES(" + \
+                      str(i) + "," + "'" + temp + "'" + ")"
+                cursor.execute(sql)
+
+            db.commit()  # 提交数据
+
+    finally:
+        db.close()
+
+def update_WordIndex_Context(word_index_context):
+    db = pymysql.connect(**config)
+
+    try:
+        with db.cursor() as cursor:
+            #sql="select * from " + db_name
+            #cursor.execute(sql)
+
+            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            sql = "drop table if exists " + context_index_tablename
+            cursor.execute(sql)
+            '''创建表'''
+            sql = "create table " + context_index_tablename + "(value INT,word VARCHAR(50))"
+            cursor.execute(sql)  # 创建表
+
+            '''把所有的东西放进表格'''
+            word_index_list = list(word_index_context)         # 这个是字典dict，而且主键居然是文字，非常难操作
+            size_index = len(word_index_context)
+            for i in range(1, size_index):
+                temp = word_index_list[i]
+                sql = "INSERT INTO " + context_index_tablename + "(value,word) VALUES(" + \
+                      str(i) + "," + "'" + temp + "'" + ")"
+                cursor.execute(sql)
+
+            db.commit()  # 提交数据
+
+    finally:
+        db.close()
+

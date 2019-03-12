@@ -4,6 +4,8 @@ import jieba
 from collections import Counter
 from keras.preprocessing.text import Tokenizer
 
+import db_setplotinfo
+
 config = {
     'host':'127.0.0.1',
     'port':3306,                        # MySQL默认端口
@@ -180,6 +182,9 @@ def Chinese_Importer(sample_num):
     tokenizer.fit_on_texts(keras_dict_context)   # 构建索引单词
     sequences = tokenizer.texts_to_sequences(context_vocabulary)   # 将字符串转换为整数索引组成的列表
     one_hot_context = tokenizer.texts_to_matrix(context_vocabulary, mode='binary')  #可以直接得到one-hot二进制表示。
+
+    db_setplotinfo.update_WordIndex_Title(word_index_title)
+    db_setplotinfo.update_WordIndex_Context(word_index_content)
 
     print(233)      # 用来设断点的
 
