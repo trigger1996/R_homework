@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sklearn
 
 import data
+import db_setplotinfo
 
 '''几个参考'''
 '''使用TensorFlow构建一个简单的回归预测模型'''
@@ -87,10 +88,28 @@ def data_Importer():
     #y_t = scaler.fit_transform(y_t.reshape(-1, 1))                             # 归一化数据，这个reshape是被逼的，https://blog.csdn.net/GrinAndBearIt/article/details/79286027
     y_t = np.reshape(y_t, (n_samples, 1)).astype(float)
     y = []
-    for i in range(0, n_samples):                                               # 转换成列表
+    for i in range(0, n_samples):                                              # 转换成列表
         y.append(y_t[i][0])
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=data_test_volume, random_state=1)
+
+    train_index = []
+    for i in range(1, n_samples_train):
+        for j in range(1, n_samples):
+            if (x_train[i] == x[j]).all():
+                train_index.append(j)
+                continue                                                        # 肯定只有一个是相同的，所以找到了就continue
+
+    test_index = []
+    for i in range(1, n_samples_test):
+        for j in range(1, n_samples):
+            if (x_test[i] == x[j]).all():
+                test_index.append(j)
+                continue
+
+    db_setplotinfo.set_SQL_traindata_index(x_train, y_train, train_index, n_samples_train)  # 把训练集索引数据上传至数据库
+    db_setplotinfo.set_SQL_testdata_index(x_test, y_test, test_index, n_samples_test - 1)   # 把测试集索引数据上传至数据库
+                                                                                            # - 1是bug了
 
     return input_dim, x_train, x_test, y_train, y_test
 
