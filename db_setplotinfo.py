@@ -109,7 +109,7 @@ def update_WordIndex_Title(word_index_title):
             '''把所有的东西放进表格'''
             word_index_list = list(word_index_title)         # 这个是字典dict，而且主键居然是文字，非常难操作
             size_index = len(word_index_title)
-            for i in range(1, size_index):
+            for i in range(0, size_index):
                 temp = word_index_list[i]
                 sql = "INSERT INTO " + title_index_tablename + "(value,word) VALUES(" + \
                       str(i) + "," + "'" + temp + "'" + ")"
@@ -131,20 +131,27 @@ def update_WordIndex_Context(word_index_context):
             '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
             sql = "drop table if exists " + context_index_tablename
             cursor.execute(sql)
-            '''创建表'''
-            sql = "create table " + context_index_tablename + "(value INT,word VARCHAR(50))"
-            cursor.execute(sql)  # 创建表
 
-            '''把所有的东西放进表格'''
             word_index_list = list(word_index_context)         # 这个是字典dict，而且主键居然是文字，非常难操作
-            size_index = len(word_index_context)
-            for i in range(1, size_index):
-                temp = word_index_list[i]
-                sql = "INSERT INTO " + context_index_tablename + "(value,word) VALUES(" + \
-                      str(i) + "," + "'" + temp + "'" + ")"
+            size_thousand = len(word_index_context)  // 1000
+            size_mod      = len(word_index_context)  %  1000
+
+            '''这里有个bug，sql的单张数据表只能放1000个数据，所以只能多搞几个表格'''
+            '''所以要删掉所有的'''
+            for i in range(0, size_thousand):
+                sql = "drop table if exists " + context_index_tablename + str(i)
                 cursor.execute(sql)
 
-            db.commit()  # 提交数据
+            for i in range(0, size_thousand):
+                sql = "create table " + context_index_tablename + str(i) + "(value INT,word VARCHAR(50))"
+                cursor.execute(sql)  # 创建表
+                for j in range(0, size_mod):
+                    '''把所有的东西放进表格'''
+                    temp = word_index_list[i * 1000 + j]
+                    sql = "INSERT INTO " + context_index_tablename + str(i) + "(value,word) VALUES(" + \
+                          str(j) + "," + "'" + temp + "'" + ")"
+                    cursor.execute(sql)
+                db.commit()  # 提交数据
 
     finally:
         db.close()

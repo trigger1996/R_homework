@@ -20,6 +20,9 @@
 	
 	R的解释机制很有意思，如果中间的代码爆炸了，他是会继续执行下去的
 	
+### paste和paste0连接字符串
+	paste0("233", as.character(1))
+	paste("233", as.character(1))
 	
 	
 ## 参考
