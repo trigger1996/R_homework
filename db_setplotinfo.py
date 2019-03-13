@@ -11,10 +11,17 @@ config = {
 }
 
 db_name         = 'db'
+
 train_tablename = 'wordlist_train'
 test_tablename  = 'wordlist_test'
+
 title_index_tablename   = 'word_index_title'
 context_index_tablename = 'word_index_context'
+
+result_train_tablename = 'ann_result_train'
+result_test_tablename  = 'ann_result_test'
+
+weight_trained_tablename = 'weight_trained'
 
 def set_SQL_traindata_index(train_x, train_y, index, number_train):
     db = pymysql.connect(**config)
@@ -142,3 +149,82 @@ def update_WordIndex_Context(word_index_context):
     finally:
         db.close()
 
+
+def update_TestResult_Train(y_train, y_real, n_samples):
+    db = pymysql.connect(**config)
+
+    try:
+        with db.cursor() as cursor:
+            #sql="select * from " + db_name
+            #cursor.execute(sql)
+
+            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            sql = "drop table if exists " + result_train_tablename
+            cursor.execute(sql)
+            '''创建表'''
+            sql = "create table " + result_train_tablename + "(id INT,predict_val DOUBLE, real_val DOUBLE)"
+            cursor.execute(sql)  # 创建表
+
+            '''把所有的东西放进表格'''
+            for i in range(0, n_samples):
+                sql = "INSERT INTO " + result_train_tablename + "(id,predict_val,real_val) VALUES(" + \
+                      str(i) + "," + str(y_train[i]) + "," + str(y_real[i][0]) + ")"
+                cursor.execute(sql)
+
+            db.commit()  # 提交数据
+
+    finally:
+        db.close()
+
+def update_TestResult_Test(y_test, y_real, n_samples):
+    db = pymysql.connect(**config)
+
+    try:
+        with db.cursor() as cursor:
+            #sql="select * from " + db_name
+            #cursor.execute(sql)
+
+            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            sql = "drop table if exists " + result_test_tablename
+            cursor.execute(sql)
+            '''创建表'''
+            sql = "create table " + result_test_tablename + "(id INT,predict_val DOUBLE, real_val DOUBLE)"
+            cursor.execute(sql)  # 创建表
+
+            '''把所有的东西放进表格'''
+            for i in range(0, n_samples):
+                sql = "INSERT INTO " + result_test_tablename + "(id,predict_val,real_val) VALUES(" + \
+                      str(i) + "," + str(y_test[i]) + "," + str(y_real[i][0]) + ")"
+                cursor.execute(sql)
+
+            db.commit()  # 提交数据
+
+    finally:
+        db.close()
+
+def store_WeightTrained(weight_list):
+    db = pymysql.connect(**config)
+
+    try:
+        with db.cursor() as cursor:
+            #sql="select * from " + db_name
+            #cursor.execute(sql)
+
+            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            sql = "drop table if exists " + weight_trained_tablename
+            cursor.execute(sql)
+            '''创建表'''
+            sql = "create table " + weight_trained_tablename + "(id INT,layer_1 DOUBLE)"
+            cursor.execute(sql)  # 创建表
+
+            '''把所有的东西放进表格'''
+            size_list = len(weight_list)
+            for i in range(0, size_list):
+                sql = "INSERT INTO " + weight_trained_tablename + "(id,layer_1) VALUES(" + \
+                      str(i) + "," + str(weight_list[i][0]) + ")"
+                cursor.execute(sql)
+
+            db.commit()  # 提交数据
+
+    finally:
+        db.close()

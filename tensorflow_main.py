@@ -195,16 +195,25 @@ with tf.Session() as sess:
     x_plt_test  = range(0, n_samples_test)
 
     '''输出参数'''
+    y_predict_train = sess.run(predictions, feed_dict={xs: x_train_np})
+    result_weight   = sess.run(weights).tolist()
     print("weights:", sess.run(weights), "-bias:", sess.run(biases))
     plt.plot(x_plt_train, y_train, "ro", label="original data")
-    plt.plot(x_plt_train, sess.run(predictions, feed_dict={xs: x_train_np}), label="predict data")
+    plt.plot(x_plt_train, y_predict_train, label="predict data")
     plt.legend(loc="upper left")
     plt.show()
 
     '''计算回归模型在测试数据上的loss'''
     print("test loss:%.4f", sess.run(loss, feed_dict={xs: x_test_np, ys: y_test}))
     '''绘图'''
+    y_predict_test = sess.run(predictions, feed_dict={xs: x_test_np})
     plt.plot(x_plt_test, y_test, "bo", label="test data")
     plt.plot(x_plt_test, sess.run(predictions, feed_dict={xs: x_test_np}), label="predict test")
     plt.legend(loc="upper left")
     plt.show()
+
+
+    db_setplotinfo.update_TestResult_Train(y_train, y_predict_train.tolist(), n_samples_train)      # 储存训练数据结果
+    db_setplotinfo.update_TestResult_Test(y_test,   y_predict_test.tolist(),  n_samples_test - 1)   # 储存测试数据结果，这里bug了，所以减去1
+    db_setplotinfo.store_WeightTrained(result_weight)                                               # 储存测试权重
+
