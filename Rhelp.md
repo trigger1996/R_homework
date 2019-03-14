@@ -24,6 +24,14 @@
 	paste0("233", as.character(1))
 	paste("233", as.character(1))
 	
+### 求数据框的长度
+	假设数据框名字叫df
+	那么dim(df)[1]返回它的行数。dim求的是参数的维度 	
+	
+### 合并可以用c这个函数
+    word_actual <- list()
+	        word = wordindex_context[val - context_wordnum, 2]
+        word_actual <- c(word_actual, word)
 	
 ## 参考
 	RColorBrewer:		http://blog.sina.com.cn/s/blog_681aaa5501016tk4.html

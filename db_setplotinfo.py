@@ -129,8 +129,8 @@ def update_WordIndex_Context(word_index_context):
             #cursor.execute(sql)
 
             '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
-            sql = "drop table if exists " + context_index_tablename
-            cursor.execute(sql)
+            #sql = "drop table if exists " + context_index_tablename
+            #cursor.execute(sql)
 
             word_index_list = list(word_index_context)         # 这个是字典dict，而且主键居然是文字，非常难操作
             size_thousand = len(word_index_context)  // 1000
@@ -138,14 +138,18 @@ def update_WordIndex_Context(word_index_context):
 
             '''这里有个bug，sql的单张数据表只能放1000个数据，所以只能多搞几个表格'''
             '''所以要删掉所有的'''
-            for i in range(0, size_thousand):
+            for i in range(0, size_thousand + 1):
                 sql = "drop table if exists " + context_index_tablename + str(i)
                 cursor.execute(sql)
 
-            for i in range(0, size_thousand):
+            for i in range(0, size_thousand + 1):
                 sql = "create table " + context_index_tablename + str(i) + "(value INT,word VARCHAR(50))"
                 cursor.execute(sql)  # 创建表
-                for j in range(0, size_mod):
+                if (i >= size_thousand):
+                    j_max = size_mod
+                else:
+                    j_max = 1000
+                for j in range(0, j_max):
                     '''把所有的东西放进表格'''
                     temp = word_index_list[i * 1000 + j]
                     sql = "INSERT INTO " + context_index_tablename + str(i) + "(value,word) VALUES(" + \
@@ -217,21 +221,32 @@ def store_WeightTrained(weight_list):
             #sql="select * from " + db_name
             #cursor.execute(sql)
 
-            '''第一件事情是要删掉旧的表格，因为每次读取进来列的树木都是不一样的'''
+            size_thousand = len(weight_list) // 1000
+            size_mod = len(weight_list) % 1000
+
+            '''这里有个bug，sql的单张数据表只能放1000个数据，所以只能多搞几个表格'''
+            '''所以要删掉所有的'''
             sql = "drop table if exists " + weight_trained_tablename
             cursor.execute(sql)
-            '''创建表'''
-            sql = "create table " + weight_trained_tablename + "(id INT,layer_1 DOUBLE)"
-            cursor.execute(sql)  # 创建表
-
-            '''把所有的东西放进表格'''
-            size_list = len(weight_list)
-            for i in range(0, size_list):
-                sql = "INSERT INTO " + weight_trained_tablename + "(id,layer_1) VALUES(" + \
-                      str(i) + "," + str(weight_list[i][0]) + ")"
+            for i in range(0, size_thousand + 1):
+                sql = "drop table if exists " + weight_trained_tablename + str(i)
                 cursor.execute(sql)
 
-            db.commit()  # 提交数据
+            '''创建表'''
+            #sql = "create table " + weight_trained_tablename + "(id INT,layer_1 DOUBLE)"
+            #cursor.execute(sql)  # 创建表
+            for i in range(0, size_thousand + 1):
+                sql = "create table " + weight_trained_tablename + str(i) + "(id INT,layer_1 DOUBLE)"
+                cursor.execute(sql)  # 创建表
+                if (i >= size_thousand):
+                    j_max = size_mod
+                else:
+                    j_max = 1000
+                for j in range(0, j_max):
+                    sql = "INSERT INTO " + weight_trained_tablename + str(i) + "(id,layer_1) VALUES(" + \
+                          str(j) + "," + str(weight_list[j][0]) + ")"
+                    cursor.execute(sql)
+                db.commit()  # 提交数据
 
     finally:
         db.close()
