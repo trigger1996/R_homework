@@ -175,7 +175,7 @@ ggplot(data = ann_result_train, aes(x=id)) +
   geom_line(aes(y=predict_val, color="cyan"))
 
 ggplot(data = ann_result_train, aes(x=id)) + 
-  geom_point(aes(y=predict_val), color=mycolors[1]) + 
+  geom_point(aes(y=predict_val, color=mycolors[1])) + 
   geom_bar(stat='identity', aes(y=predict_val, color=mycolors[2])) +
   labs(x=NULL,y=NULL,fill=NULL) +
   coord_cartesian(ylim = c(0,10000)) +
@@ -196,9 +196,30 @@ p = ggplot(ann_result_train, aes(x = id,y = predict_val,fill = real_val))+
   #      legend.key.size=unit(0.8,'cm'))
 print(p)
 
-ggplot(data = ann_result_train, aes(x=id, colors = mycolors[1:2])) + 
-  geom_point(aes(y=predict_val)) + 
-  geom_bar(stat='identity', aes(y=predict_val)) +
-  labs(x=NULL,y=NULL,fill=NULL) +
-  coord_cartesian(ylim = c(0,10000))
+# https://blog.csdn.net/zx403413599/article/details/48581713
+# https://blog.csdn.net/bone_ace/article/details/47284805
+ggplot(data = ann_result_train, aes(x=id)) + 
+  geom_point(aes(y=predict_val, color=mycolors[1])) + 
+  geom_bar(stat='identity', aes(y=predict_val, color=mycolors[2])) +
+  coord_cartesian(ylim = c(0,10000)) +
+  guides(color=guide_legend(title="数据类型")) +    ## 如果是NULL, 就是对color产生的图例去掉标题
+  scale_colour_discrete(breaks = c(mycolors[1],mycolors[2]), labels = c('预测结果','实际结果'))
 
+ggplot(data = ann_result_train, aes(x=id, y=real_val, fill = real_val))  +
+  geom_bar(stat='identity', aes(y=real_val))
+
+# http://f.dataguru.cn/thread-864133-1-3.html
+ggplot(data = ann_result_train, aes(x=id, fill = real_val)) + 
+  geom_point(aes(y=real_val)) + 
+  geom_bar(stat='identity', aes(y=predict_val)) +
+  coord_cartesian(ylim = c(0,10000)) + 
+  scale_fill_brewer()
+
+ggplot(data = ann_result_train, aes(x=id)) + 
+  geom_point(aes(y=predict_val, fill=mycolors[1], color=mycolors[1])) + 
+  geom_bar(stat='identity', aes(y=predict_val, fill=mycolors[2], color=mycolors[2])) +
+  coord_cartesian(ylim = c(0,10000)) +
+  guides(color=guide_legend(title="数据类型")) +    ## 如果是NULL, 就是对color产生的图例去掉标题
+  scale_colour_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果','实际结果')) +
+  guides(fill=guide_legend(title="数据类型2")) +
+  scale_fill_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果2','实际结果2'))
