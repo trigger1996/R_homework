@@ -5,8 +5,13 @@
 	ggplot2
 	RColorBrewer
 
+	options(CRAN="https://​cloud.r-project.org/");
+	install.packages("ggplot2")
+
 	install.packages("RColorBrewer")
 	library(RColorBrewer)
+	
+	
 	
 ## 几个和语法有关的
 	等号(赋值号)		= 或者 <-	由于R语言在写的时候比较奇葩，所以<-比=好用
@@ -32,6 +37,9 @@
     word_actual <- list()
 	        word = wordindex_context[val - context_wordnum, 2]
         word_actual <- c(word_actual, word)
+
+### 关于ggplot2
+	http://ask.pinggu.org/q-41481.html
 	
 ## 参考
 	RColorBrewer:		http://blog.sina.com.cn/s/blog_681aaa5501016tk4.html

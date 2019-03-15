@@ -11,7 +11,15 @@ if (which(all_packages == 'stringr') == 0) {
   install.packages("stringr")
 }
 library("stringr")
-
+# 安装ggplot和ggplot2
+if (which(all_packages == 'ggplot2') == 0) {
+  install.packages("ggplot2")
+}
+library("ggplot2")
+if (which(all_packages == 'RColorBrewer') == 0) {
+  install.packages("RColorBrewer")
+}
+library("RColorBrewer")
 
 
 wordlist_train_tablename = "wordlist_train"
@@ -107,23 +115,23 @@ for (i in 1 : row_len) {                                        # row_len, debug
     for (j in 1 : table_len) {
       val = as.numeric(word_index[[1]][j])
       
-      if (val < context_wordnum) {                              # 他这个顺序是先正文，后标题，再是否有【
+      if (val <= context_wordnum) {                             # 他这个顺序是先正文，后标题，再是否有【
         word = wordindex_context[val, 2]                        # 从索引里查找这个字符
         word_actual[[1]][j] <- as.character(word)               # 把这个字符合并到列表内
         #print(word)
       } else if (val < context_wordnum + title_worldnum) {
-        word = wordindex_context[val - context_wordnum, 2]
+        word = wordindex_title[val - context_wordnum, 2]
         word_actual[[1]][j] <- as.character(word)               # 
-        #print(word)
+        #print(word)        
       } else {
         
       }
     }
-    print(word_actual)
+    #print(word_actual)
     word_actual_train <- cbind(word_actual_train, word_actual)
 }
 
-# 先数据集
+# 测试集
 row_len = dim(wordlist_test)[1]
 word_actual_test <- list()
 for (i in 1 : row_len) {                                      # row_len, debug的时候可以用5
@@ -138,19 +146,59 @@ for (i in 1 : row_len) {                                      # row_len, debug�
   for (j in 1 : table_len) {
     val = as.numeric(word_index[[1]][j])
     
-    if (val < context_wordnum) {                              # 他这个顺序是先正文，后标题，再是否有【
+    if (val <= context_wordnum) {                             # 他这个顺序是先正文，后标题，再是否有【
       word = wordindex_context[val, 2]                        # 从索引里查找这个字符
       word_actual[[1]][j] <- as.character(word)               # 把这个字符合并到列表内
       #print(word)
     } else if (val < context_wordnum + title_worldnum) {
-      word = wordindex_context[val - context_wordnum, 2]
+      word = wordindex_title[val - context_wordnum, 2]
       word_actual[[1]][j] <- as.character(word)               # 
       #print(word)
     } else {
       
     }
   }
-  #(word_actual)
+  #print(word_actual)
   word_actual_test <- cbind(word_actual_test, word_actual)
 }
+
+# 条形图
+mycolors<-brewer.pal(9,"YlGnBu")
+
+ggplot(data = ann_result_train, aes(x = id, y = predict_val, fill = real_val)) + 
+      geom_bar(stat='identity',position=position_dodge(), width = 5) +
+      labs(x=NULL,y=NULL,fill=NULL)+    #可自定义标签名字
+      coord_cartesian(ylim = c(0,10000))  #设置下面一半的值域#ggplot(mtcars,aes(x=cyl,y=mpg,fill=vs))+geom_bar(stat="identity",position="dodge")
+  
+ggplot(data = ann_result_train, aes(x=id)) + 
+  geom_point(aes(y=predict_val), color="blue") + 
+  geom_line(aes(y=predict_val, color="cyan"))
+
+ggplot(data = ann_result_train, aes(x=id)) + 
+  geom_point(aes(y=predict_val), color=mycolors[1]) + 
+  geom_bar(stat='identity', aes(y=predict_val, color=mycolors[2])) +
+  labs(x=NULL,y=NULL,fill=NULL) +
+  coord_cartesian(ylim = c(0,10000)) +
+  theme(legend.position="none")
+
+
+p = ggplot(ann_result_train, aes(x = id,y = predict_val,fill = real_val))+
+  #####这部分的position_dodge(width=0.8)大于宽width = 0.6点，可以使得分组内柱子之间有缝隙，而不是贴合。
+  geom_bar(stat ="identity",width = 0.6,position = position_dodge(width=0.8))+        
+  labs(x = "",y = "", title = "test")+
+  ###########文字的position设置类似bar的position
+  #geom_text(aes(label = ann_result_train$id),position=position_dodge(width = 0.9),size = 5,vjust = -0.25)+  
+  guides(fill = guide_legend(reverse = F))#+
+  #theme(plot.title = element_text(size = 25,face = "bold", vjust = 0.5, hjust = 0.5),
+  #      legend.title = element_blank(),
+  #      legend.text = element_text(size = 18, face = "bold"),
+  #      legend.position = 'right',
+  #      legend.key.size=unit(0.8,'cm'))
+print(p)
+
+ggplot(data = ann_result_train, aes(x=id, colors = mycolors[1:2])) + 
+  geom_point(aes(y=predict_val)) + 
+  geom_bar(stat='identity', aes(y=predict_val)) +
+  labs(x=NULL,y=NULL,fill=NULL) +
+  coord_cartesian(ylim = c(0,10000))
 
