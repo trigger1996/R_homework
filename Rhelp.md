@@ -39,7 +39,11 @@
         word_actual <- c(word_actual, word)
 
 ### 关于ggplot2
-	http://ask.pinggu.org/q-41481.html
+	http://ask.pinggu.org/q-41481.html、
+	
+### wordcloud2词云
+	https://www.cnblogs.com/nxld/p/6344233.html?utm_source=itdadao&utm_medium=referral
+	http://tieba.baidu.com/p/5522266099
 	
 ## 参考
 	RColorBrewer:		http://blog.sina.com.cn/s/blog_681aaa5501016tk4.html

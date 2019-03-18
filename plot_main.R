@@ -20,6 +20,10 @@ if (which(all_packages == 'RColorBrewer') == 0) {
   install.packages("RColorBrewer")
 }
 library("RColorBrewer")
+if (which(all_packages == 'wordcloud2') == 0) {
+  install.packages("wordcloud2")
+}
+library("wordcloud2")
 
 
 wordlist_train_tablename = "wordlist_train"
@@ -223,3 +227,15 @@ ggplot(data = ann_result_train, aes(x=id)) +
   scale_colour_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果','实际结果')) +
   guides(fill=guide_legend(title="数据类型2")) +
   scale_fill_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果2','实际结果2'))
+
+
+## 词云
+ann_weight_min = min(ann_weight[,2])
+ann_weight_norm = ann_weight[,2] + abs(ann_weight_min) + 1
+word_cloud = c(wordindex_context[,2], wordindex_title[,2])
+word_cloud = data.frame(word=word_cloud, freq=ann_weight_norm[1:4621])
+
+wordcloud2(word_cloud, color = "random-light", backgroundColor = "white")
+#letterCloud(word_cloud,word = "R", color = "random-light", backgroundColor = "white")
+wordcloud2(word_cloud, color = "random-light",shape = 'star')
+wordcloud2(word_cloud, size = 1, shape='cardioid',color = 'random-dark', backgroundColor = "white",fontFamily = "微软雅黑") 
