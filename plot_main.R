@@ -169,6 +169,14 @@ for (i in 1 : row_len) {                                      # row_len, debug�
 # 条形图
 mycolors<-brewer.pal(9,"YlGnBu")
 
+ggplot(data = ann_result_train, aes(x = id, y = predict_val)) + 
+  geom_bar(stat='identity',position=position_dodge()) +
+  labs(x=NULL,y=NULL,fill=NULL)
+
+ggplot(data = ann_result_train, aes(x = id, y = predict_val, fill = predict_val)) + 
+  geom_bar(stat='identity',position=position_dodge(), width = 5) +
+  labs(x=NULL,y=NULL,fill=NULL)
+
 ggplot(data = ann_result_train, aes(x = id, y = predict_val, fill = real_val)) + 
       geom_bar(stat='identity',position=position_dodge(), width = 5) +
       labs(x=NULL,y=NULL,fill=NULL)+    #可自定义标签名字
@@ -176,11 +184,11 @@ ggplot(data = ann_result_train, aes(x = id, y = predict_val, fill = real_val)) +
   
 ggplot(data = ann_result_train, aes(x=id)) + 
   geom_point(aes(y=predict_val), color="blue") + 
-  geom_line(aes(y=predict_val, color="cyan"))
+  geom_line(aes(y=real_val, color="cyan"))
 
 ggplot(data = ann_result_train, aes(x=id)) + 
   geom_point(aes(y=predict_val, color=mycolors[1])) + 
-  geom_bar(stat='identity', aes(y=predict_val, color=mycolors[2])) +
+  geom_bar(stat='identity', aes(y=real_val, color=mycolors[2])) +
   labs(x=NULL,y=NULL,fill=NULL) +
   coord_cartesian(ylim = c(0,10000)) +
   theme(legend.position="none")
@@ -204,7 +212,7 @@ print(p)
 # https://blog.csdn.net/bone_ace/article/details/47284805
 ggplot(data = ann_result_train, aes(x=id)) + 
   geom_point(aes(y=predict_val, color=mycolors[1])) + 
-  geom_bar(stat='identity', aes(y=predict_val, color=mycolors[2])) +
+  geom_bar(stat='identity', aes(y=real_val, color=mycolors[2])) +
   coord_cartesian(ylim = c(0,10000)) +
   guides(color=guide_legend(title="数据类型")) +    ## 如果是NULL, 就是对color产生的图例去掉标题
   scale_colour_discrete(breaks = c(mycolors[1],mycolors[2]), labels = c('预测结果','实际结果'))
@@ -221,15 +229,25 @@ ggplot(data = ann_result_train, aes(x=id, fill = real_val)) +
 
 ggplot(data = ann_result_train, aes(x=id)) + 
   geom_point(aes(y=predict_val, fill=mycolors[1], color=mycolors[1])) + 
-  geom_bar(stat='identity', aes(y=predict_val, fill=mycolors[2], color=mycolors[2])) +
+  geom_bar(stat='identity', aes(y=real_val, fill=mycolors[2], color=mycolors[2])) +
   coord_cartesian(ylim = c(0,10000)) +
   guides(color=guide_legend(title="数据类型")) +    ## 如果是NULL, 就是对color产生的图例去掉标题
   scale_colour_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果','实际结果')) +
   guides(fill=guide_legend(title="数据类型2")) +
   scale_fill_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果2','实际结果2'))
 
+ggplot(data = ann_result_train, aes(x=id)) + 
+  geom_point(aes(y=predict_val, fill=mycolors[1], color=mycolors[1])) + 
+  geom_bar(stat='identity', aes(y=real_val, fill=mycolors[2], color=mycolors[2])) +
+  coord_cartesian(ylim = c(0,10000)) +
+  guides(color=FALSE) +    ## 如果是NULL, 就是对color产生的图例去掉标题
+  guides(fill=guide_legend(title="数据类型")) +
+  scale_fill_discrete(breaks = c(mycolors[2],mycolors[1]), labels = c('预测结果','实际结果'))
+
 
 ## 词云
+# https://blog.csdn.net/Eton2016/article/details/78360577
+# https://cosx.org/2016/08/wordcloud2
 ann_weight_min = min(ann_weight[,2])
 ann_weight_norm = ann_weight[,2] + abs(ann_weight_min) + 1
 word_cloud = c(wordindex_context[,2], wordindex_title[,2])
@@ -238,4 +256,10 @@ word_cloud = data.frame(word=word_cloud, freq=ann_weight_norm[1:4621])
 wordcloud2(word_cloud, color = "random-light", backgroundColor = "white")
 #letterCloud(word_cloud,word = "R", color = "random-light", backgroundColor = "white")
 wordcloud2(word_cloud, color = "random-light",shape = 'star')
-wordcloud2(word_cloud, size = 1, shape='cardioid',color = 'random-dark', backgroundColor = "white",fontFamily = "微软雅黑") 
+wordcloud2(word_cloud, color = "random-light",shape = 'star', fontFamily = "等线")
+wordcloud2(word_cloud, color = "random-light",shape = 'pentagon', fontFamily = "等线")
+wordcloud2(word_cloud, size = 0.4, shape='cardioid',color = 'random-dark', backgroundColor = "white",fontFamily = "微软雅黑") 
+
+figPath = system.file("examples/t.png",package = "wordcloud2")
+wordcloud2(word_cloud, shape = "triangle", size = 0.2,color = "random-light")
+
